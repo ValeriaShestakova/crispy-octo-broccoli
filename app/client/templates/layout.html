@@ -27,11 +27,11 @@
       </nav>
     <div class="jumbotron">
       <div class="container">
-        {% with messages = get_flashed_messages() %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
-            {% for message in messages %}
             <h3>Your data is correct</h3>
-            <p>{{ message }}<p>
+            {% for category, message in messages %}
+            <p>{{ category }}: {{ message }}<p>
             {% endfor %}
           {% else %}
           <h1>Hello!</h1>

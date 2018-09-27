@@ -1,11 +1,14 @@
 from flask_wtf import FlaskForm
-from wtforms import DateField, IntegerField, SelectMultipleField, widgets
+from wtforms import DateField, IntegerField, SelectMultipleField, widgets, RadioField
 from wtforms.validators import DataRequired
 
 
 class EnterForm(FlaskForm):
     enter_id = IntegerField('enter_id',  validators=[DataRequired()])
     begin_date = DateField('begin_date',  format='%d.%m.%Y')
+    choices = [('person', 'person'),
+               ('group', 'group')]
+    type_id = RadioField(choices=choices)
 
 
 class CsvParam(SelectMultipleField):

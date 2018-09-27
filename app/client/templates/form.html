@@ -7,7 +7,7 @@
     <strong>Error</strong> {{ error }}
   </div>
   {% endif %}
-  <h2>Введите необходимые данные</h2>
+  <h2>Enter required data</h2>
   <form action='/enter_data' method="post" name="enter_data">
     {{ form.csrf_token }}
     <div class="form-group">
@@ -17,6 +17,10 @@
     <div class="form-group">
       <label for="begin_date">Begin date</label>
       {{form.begin_date(class_="form-control", placeholder="01.05.2017")}}
+    </div>
+    <div class="form-group">
+      <label for="begin_date">Choose type</label>
+      {{form.type_id}}
     </div>
     <input type="submit" class="btn btn-primary" value="Search">
   </form>

@@ -1,7 +1,8 @@
 from flask import (
-    render_template, redirect, flash)
+    render_template, redirect, flash, get_flashed_messages)
 from app import app
 from app.server.forms import EnterForm, CsvForm
+from app.server.models import QueryData
 
 
 @app.route('/')
@@ -14,18 +15,30 @@ def index():
 def enter_data():
     form = EnterForm()
     if form.validate_on_submit():
-        flash(f'ID = {str(form.enter_id.data)}, begin_date = '
-              f'{str(form.begin_date.data)}')
-        return redirect('/get_data')
+        enter_id = form.enter_id.data
+        begin_date = form.begin_date.data
+        if form.type_id.data == 'group':
+            enter_id = (-1)*enter_id
+        query_data = QueryData(enter_id, begin_date)
+        if query_data.valid is True:
+            flash(enter_id, 'enter_id')
+            flash(str(begin_date), 'begin_date')
+            return redirect('/get_data')
+        else:
+            error_mes = 'No such person or group, or date is not valid'
+    else:
+        error_mes = form.errors
     return render_template('form.html',
-                           form=form, error=form.errors)
+                           form=form, error=error_mes)
 
 
 @app.route('/get_data', methods=['GET', 'POST'])
 def get_data():
     form = CsvForm()
+    received_data = get_flashed_messages(with_categories=True)
+    subject_info = {category: message for category, message in received_data}
+    query_data = \
+        QueryData(subject_info['enter_id'], subject_info['begin_date'], True)
     if form.validate_on_submit():
-        print(form.csv_param.data)
-    else:
-        print(form.errors)
+        return render_template('get_data.html', form=form)
     return render_template('get_data.html', form=form)
