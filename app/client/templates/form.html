@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+{% block form %}
+
+<div class="col-md-8">
+  {% if error %}
+  <div class="alert alert-danger">
+    <strong>Error</strong> {{ error }}
+  </div>
+  {% endif %}
+  <h2>Введите необходимые данные</h2>
+  <form action='/enter_data' method="post" name="enter_data">
+    {{ form.csrf_token }}
+    <div class="form-group">
+      <label for="enter_id">Person or group ID</label>
+      {{form.enter_id(class_="form-control", placeholder="123456")}}
+    </div>
+    <div class="form-group">
+      <label for="begin_date">Begin date</label>
+      {{form.begin_date(class_="form-control", placeholder="01.05.2017")}}
+    </div>
+    <input type="submit" class="btn btn-primary" value="Search">
+  </form>
+</div>
+{% endblock %}
