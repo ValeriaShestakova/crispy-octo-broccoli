@@ -1,5 +1,6 @@
 from flask import (
     render_template, redirect, flash, get_flashed_messages)
+import datetime
 from app import app
 from app.server.forms import EnterForm, CsvForm
 from app.server.models import QueryData
@@ -19,7 +20,10 @@ def enter_data():
         begin_date = form.begin_date.data
         if form.type_id.data == 'group':
             enter_id = (-1)*enter_id
-        query_data = QueryData(enter_id, begin_date)
+        if begin_date < datetime.date(1970, 1, 1):
+            query_data = QueryData(enter_id, begin_date, False)
+        else:
+            query_data = QueryData(enter_id, begin_date)
         if query_data.valid is True:
             flash(enter_id, 'enter_id')
             flash(str(begin_date), 'begin_date')
@@ -40,5 +44,7 @@ def get_data():
     query_data = \
         QueryData(subject_info['enter_id'], subject_info['begin_date'], True)
     if form.validate_on_submit():
-        return render_template('get_data.html', form=form)
+        return redirect('/')
+    flash(query_data.id, 'enter_id')
+    flash(subject_info['begin_date'], 'begin_date')
     return render_template('get_data.html', form=form)
