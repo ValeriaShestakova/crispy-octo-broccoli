@@ -1,32 +1,52 @@
-import datetime
-import json
-import requests
-from app import app
 
+class Post:
 
-class QueryData:
+    def __init__(self, data):
+        self.data = data
+        self.path_csv = '../../client/static/temp.csv'
 
-    def __init__(self, enter_id, begin_date, valid=None):
-        self.id = enter_id
-        self.date = datetime.datetime.strptime(str(begin_date), "%Y-%m-%d")\
-            .timestamp()
-        self.access_token = app.config['ACCESS_TOKEN']
-        if valid is None:
-            self.valid = self.check_data_vk()
-        else:
-            self.valid = valid
+    @property
+    def post_id(self):
+        return self.data['id']
 
-    def check_data_vk(self):
-        url = f'https://api.vk.com/method/wall.get?owner_id={self.id}&count=1' \
-              f'&v=5.52&access_token={self.access_token}'
-        obj = json.loads(requests.get(url).content)
-        flag = False
+    @property
+    def text(self):
+        return self.data['text']
+
+    @property
+    def att(self):
+        attr_id = []
         try:
-            obj['error']
+            for i in self.data['attachments']:
+                i_type = i['type']
+                if i_type == 'photos_list':
+                    pass
+                else:
+                    attr_id.append(str(i[i_type]['id']))
+            return ', '.join(attr_id)
         except KeyError:
-            flag = True
-            if obj['response']['items'][0]['date'] < int(self.date):
-                flag = False
-        return flag
+            return ''
 
-    # def get_data_vk
+    @property
+    def num_att(self):
+        try:
+            num = len(self.data['attachments'])
+            for i in self.data['attachments']:
+                i_type = i['type']
+                if i_type == 'photos_list':
+                    num -= 1
+            return num
+        except KeyError:
+            return 0
+
+    @property
+    def num_likes(self):
+        return self.data['likes']['count']
+
+    @property
+    def num_reposts(self):
+        return self.data['reposts']['count']
+
+    @property
+    def num_comments(self):
+        return self.data['comments']['count']
