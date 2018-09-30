@@ -1,0 +1,40 @@
+{% extends 'layout.html' %}
+{% block get_data_posts %}
+<div class="col-md-4">
+  <h2>Download data as csv</h2>
+    <h4>Select required options </h4>
+    <form action='' method="post" name="csv_data">
+    {{ form_csv.csrf_token }}
+    {{ form_csv.csv_param(class_="list-group") }}
+    <input type="submit" class="btn btn-primary" value="Download csv">
+  </form>
+</div>
+<div class="col-md-8">
+  <h2>Get statistics of posts</h2>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages[2] %}
+  <div class="alert alert-danger">
+    <strong>Error</strong> {{ messages[2][1] }}
+  </div>
+  {% endif %}
+  {% endwith %}
+    <form action='/get_statistic' method="post" name="statistic_data">
+    {{ form_statistic.csrf_token }}
+      <div class="col-md-4">
+        <h4>Select time period</h4>
+        {{ form_statistic.type_time(class_="list-group") }}
+        <input type="submit" class="btn btn-primary" value="Show statistic">
+      </div>
+      <div class="col-md-4">
+        <h4>What do you want to see?</h4>
+        {{ form_statistic.type_measure(class_="list-group") }}
+      </div>
+    </form>
+  <div class="col-md-12">
+    <br>
+    {% block graph %}
+    {% endblock %}
+  </div>
+</div>
+
+{% endblock %}

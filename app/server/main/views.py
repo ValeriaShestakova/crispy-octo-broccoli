@@ -1,61 +1,14 @@
 from flask import (
-    render_template, redirect, flash, get_flashed_messages, send_file)
-import datetime
-import json
-import requests
-import csv
+    render_template, redirect, send_file)
+from app.server.main.functions import *
 from app import app
-from app.server.forms import EnterForm, CsvForm
-from app.server.models import Post
-
-
-def check_data_vk(enter_id, begin_date):
-    url = f'https://api.vk.com/method/wall.get?owner_id={enter_id}&count=1' \
-          f'&v=5.52&access_token={app.config["ACCESS_TOKEN"]}'
-    obj = json.loads(requests.get(url).content)
-    if begin_date < datetime.date(1970, 1, 1):
-        return False
-    dt = datetime.datetime.strptime(str(begin_date), "%Y-%m-%d").timestamp()
-    try:
-        obj['error']
-    except KeyError:
-        if obj['response']['items'][0]['date'] < int(dt):
-            return False
-        else:
-            return True
-    return False
-
-
-def get_data_vk(enter_id, begin_date, param):
-    url = f'https://api.vk.com/method/wall.get?owner_id={enter_id}' \
-          f'&v=5.52&access_token={app.config["ACCESS_TOKEN"]}'
-    obj = json.loads(requests.get(url).content)
-    posts = obj['response']['items']
-    dt = datetime.datetime.strptime(begin_date, "%Y-%m-%d").timestamp()
-    all_posts = []
-    for post in posts:
-        if post['date'] >= int(dt):
-            post = Post(post)
-            post_info = []
-            for p in param:
-                post_info.append(getattr(post, p))
-            all_posts.append(post_info)
-    to_csv(param, all_posts)
-
-
-def to_csv(param, all_posts):
-    path = app.config["PATH_CSV"]
-    with open(path, 'w', encoding='utf-8') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(param)
-        for p in all_posts:
-            writer.writerow(p)
+from app.server.forms import EnterForm, CsvForm, StatisticForm
 
 
 @app.route('/')
 def index():
     form = EnterForm()
-    return render_template('form.html', form=form)
+    return render_template('form.html', form=form, show_message=False)
 
 
 @app.route('/enter_data', methods=['GET', 'POST'])
@@ -80,14 +33,36 @@ def enter_data():
 
 @app.route('/get_data', methods=['GET', 'POST'])
 def get_data():
-    form = CsvForm()
-    received_data = get_flashed_messages(with_categories=True)
-    mes_info = {category: message for category, message in received_data}
-    flash(mes_info['enter_id'], 'enter_id')
-    flash(mes_info['begin_date'], 'begin_date')
-    if form.validate_on_submit():
-        get_data_vk(mes_info['enter_id'],  mes_info['begin_date'], form.csv_param.data)
+    form_csv = CsvForm()
+    form_statistic = StatisticForm()
+    enter_id, begin_date = flash_message()
+    if form_csv.validate_on_submit():
+        all_posts = get_data_posts(enter_id,  begin_date, form_csv.csv_param.data)
+        to_csv(form_csv.csv_param.data, all_posts)
         path = app.config["PATH_DOWNLOAD_CSV"]
         return send_file(path, as_attachment=True,
                          attachment_filename='statistics.csv')
-    return render_template('get_data.html', form=form)
+    return render_template('get_data_posts.html', form_csv=form_csv,
+                           form_statistic=form_statistic)
+
+
+@app.route('/get_statistic', methods=['GET', 'POST'])
+def get_statistic():
+    enter_id, begin_date = flash_message()
+    form_csv = CsvForm()
+    form_statistic = StatisticForm()
+    if form_statistic.validate_on_submit():
+        type_measure = form_statistic.type_measure.data
+        type_time = form_statistic.type_time.data
+        x_count_posts, x_measure, y = \
+            get_data_posts_measure(enter_id, begin_date, type_measure, type_time)
+        legend_count = 'Number of posts'
+        legend_avg = f'Average of {type_measure[4::]}'
+        return render_template('graph.html', values_count=x_count_posts, labels=y,
+                               legend_count=legend_count, values_avg=x_measure,
+                               legend_avg=legend_avg, form_csv=form_csv,
+                               form_statistic=form_statistic)
+    else:
+        error_mes = 'Choose both parameters'
+        flash(error_mes, 'error')
+        return redirect('/get_data')

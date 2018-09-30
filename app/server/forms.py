@@ -25,3 +25,15 @@ class CsvForm(FlaskForm):
                ('num_reposts', 'number of reposts'),
                ('num_comments', 'number of comments')]
     csv_param = CsvParam('Label', choices=choices)
+
+
+class StatisticForm(FlaskForm):
+    choices_time = [('year', 'years'),
+                    ('month', 'months'),
+                    ('week_day', 'days of the week'),
+                    ('hour', 'hours')]
+    type_time = RadioField(choices=choices_time)
+    choices_measure = [('num_likes', 'likes'),
+                       ('num_reposts', 'reposts'),
+                       ('num_comments', 'comments')]
+    type_measure = RadioField(choices=choices_measure)

@@ -1,0 +1,62 @@
+{% extends 'get_data_posts.html' %}
+{% block graph %}
+<h1>Look at statistic</h1> <!-- bar chart canvas element -->
+<canvas id="graph_count" width="600" height="400"></canvas>
+<hr>
+<script>
+
+var ctx = document.getElementById("graph_count").getContext("2d");
+
+var myChart = new Chart(ctx, {
+  type: 'line',
+    data: {
+    datasets: [{
+          label: '{{ legend_count }}',
+        fill: true,
+        lineTension: 0.1,
+        backgroundColor: "rgba(21,96,189,0.1)",
+        borderColor: "rgba(21,96,189,1)",
+        borderCapStyle: 'butt',
+         borderDash: [],
+         borderDashOffset: 0.0,
+         borderJoinStyle: 'miter',
+         pointBorderColor: "rgba(21,96,189,1)",
+         pointBackgroundColor: "#fff",
+         pointBorderWidth: 1,
+         pointHoverRadius: 5,
+         pointHoverBackgroundColor: "rgba(21,96,189,1)",
+         pointHoverBorderColor: "rgba(220,220,220,1)",
+         pointHoverBorderWidth: 2,
+         pointRadius: 1,
+         pointHitRadius: 10,
+         data : [{% for item in values_count %} {{item}}, {% endfor %}],
+         spanGaps: false
+        }, {
+          label: '{{ legend_avg }}',
+        fill: true,
+        lineTension: 0.1,
+        backgroundColor: "rgba(229, 43, 80, 0.1)",
+        borderColor: "rgba(229, 43, 80, 1)",
+        borderCapStyle: 'butt',
+         borderDash: [],
+         borderDashOffset: 0.0,
+         borderJoinStyle: 'miter',
+         pointBorderColor: "rgba(229, 43, 80, 1)",
+         pointBackgroundColor: "#fff",
+         pointBorderWidth: 1,
+         pointHoverRadius: 5,
+         pointHoverBackgroundColor: "rgba(229, 43, 80, 1)",
+         pointHoverBorderColor: "rgba(220,220,220,1)",
+         pointHoverBorderWidth: 2,
+         pointRadius: 1,
+         pointHitRadius: 10,
+         data : [{% for item in values_avg %} {{item}}, {% endfor %}],
+         spanGaps: false
+
+        }],
+    labels: {{ labels }}
+  },
+
+});
+</script>
+{% endblock %}

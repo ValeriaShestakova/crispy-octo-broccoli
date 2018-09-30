@@ -1,3 +1,5 @@
+import datetime
+
 
 class Post:
 
@@ -8,6 +10,26 @@ class Post:
     @property
     def post_id(self):
         return self.data['id']
+
+    @property
+    def year(self):
+        dt = self.data['date']
+        return datetime.datetime.fromtimestamp(dt).year
+
+    @property
+    def week_day(self):
+        dt = self.data['date']
+        return datetime.datetime.fromtimestamp(dt).weekday()
+
+    @property
+    def month(self):
+        dt = self.data['date']
+        return datetime.datetime.fromtimestamp(dt).month
+
+    @property
+    def hour(self):
+        dt = self.data['date']
+        return datetime.datetime.fromtimestamp(dt).hour
 
     @property
     def text(self):

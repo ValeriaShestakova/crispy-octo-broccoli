@@ -10,6 +10,7 @@
       list-style-type: none;
      }
     </style>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js'></script>
   </head>
   <body>
     <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -28,24 +29,22 @@
     <div class="jumbotron">
       <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <h3>Your data is correct</h3>
-            {% for category, message in messages %}
-            <p>{{ category }}: {{ message }}<p>
-            {% endfor %}
+          {% if messages and show_message!=False %}
+            <h3>Your entered data is correct</h3>
+            <p>ID: {{ messages[0][1] }}<br>
+            Begin date: {{ messages[1][1] }}</p>
           {% else %}
           <h1>Hello!</h1>
           <p>This is a project, where you can get some statistics of VK posts.</p>
           {% endif %}
         {% endwith %}
-
       </div>
     </div>
     <div class="container">
         <div class="row">
           {% block form %}
             {% endblock %}
-            {% block get_data %}
+            {% block get_data_posts %}
             {% endblock %}
         </div>
     </div>
