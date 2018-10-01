@@ -2,7 +2,6 @@ import datetime
 import json
 import requests
 import csv
-from flask import (flash, get_flashed_messages)
 from app.server.models import Post
 from app import app
 
@@ -22,14 +21,6 @@ def check_data_vk(enter_id, begin_date):
         else:
             return True
     return False
-
-
-def flash_message():
-    received_data = get_flashed_messages(with_categories=True)
-    mes_info = {category: message for category, message in received_data}
-    flash(mes_info['enter_id'], 'enter_id')
-    flash(mes_info['begin_date'], 'begin_date')
-    return mes_info['enter_id'], mes_info['begin_date']
 
 
 def get_data_posts(enter_id, begin_date, param):

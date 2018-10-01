@@ -1,10 +1,11 @@
 from flask_wtf import FlaskForm
-from wtforms import DateField, IntegerField, SelectMultipleField, widgets, RadioField
+from wtforms import DateField, StringField, SelectMultipleField, widgets, RadioField
 from wtforms.validators import DataRequired
 
 
 class EnterForm(FlaskForm):
-    enter_id = IntegerField('enter_id',  validators=[DataRequired()])
+
+    enter_id = StringField('enter_id',  validators=[DataRequired()])
     begin_date = DateField('begin_date',  format='%d.%m.%Y')
     choices = [('person', 'person'),
                ('group', 'group')]
@@ -12,11 +13,13 @@ class EnterForm(FlaskForm):
 
 
 class CsvParam(SelectMultipleField):
+
     widget = widgets.ListWidget(prefix_label=False)
     option_widget = widgets.CheckboxInput()
 
 
 class CsvForm(FlaskForm):
+
     choices = [('post_id', 'post id'),
                ('text', 'text'),
                ('att', 'attachments'),
@@ -28,6 +31,7 @@ class CsvForm(FlaskForm):
 
 
 class StatisticForm(FlaskForm):
+
     choices_time = [('year', 'years'),
                     ('month', 'months'),
                     ('week_day', 'days of the week'),

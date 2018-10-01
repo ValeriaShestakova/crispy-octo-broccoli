@@ -28,16 +28,14 @@
       </nav>
     <div class="jumbotron">
       <div class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages and show_message!=False %}
+          {% if enter_id %}
             <h3>Your entered data is correct</h3>
-            <p>ID: {{ messages[0][1] }}<br>
-            Begin date: {{ messages[1][1] }}</p>
+            <p>ID: {{enter_id }}<br>
+            Begin date: {{ begin_date }}</p>
           {% else %}
           <h1>Hello!</h1>
           <p>This is a project, where you can get some statistics of VK posts.</p>
           {% endif %}
-        {% endwith %}
       </div>
     </div>
     <div class="container">
