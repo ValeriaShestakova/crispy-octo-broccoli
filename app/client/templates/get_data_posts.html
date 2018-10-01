@@ -3,7 +3,7 @@
 <div class="col-md-4">
   <h2>Download data as csv</h2>
     <h4>Select required options </h4>
-    <form action='' method="post" name="csv_data">
+    <form action='/get_data' method="post" name="csv_data">
     {{ form_csv.csrf_token }}
     {{ form_csv.csv_param(class_="list-group") }}
     <input type="submit" class="btn btn-primary" value="Download csv">
