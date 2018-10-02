@@ -24,19 +24,32 @@ def check_data_vk(enter_id, begin_date):
 
 
 def get_data_posts(enter_id, begin_date, param):
-    url = f'https://api.vk.com/method/wall.get?owner_id={enter_id}' \
-          f'&v=5.52&access_token={app.config["ACCESS_TOKEN"]}'
-    obj = json.loads(requests.get(url).content)
-    posts = obj['response']['items']
+    # url = f'https://api.vk.com/method/wall.get?owner_id={enter_id}' \
+    #       f'&offset=0&count = 1&extended = 0&v=5.52' \
+    #       f'&access_token={app.config["ACCESS_TOKEN"]}'
+    # count = json.loads(requests.get(url).content)
+    # print(count)
     dt = datetime.datetime.strptime(begin_date, "%Y-%m-%d").timestamp()
     all_posts = []
-    for post in posts:
-        if post['date'] >= int(dt):
-            post = Post(post)
-            post_info = []
-            for p in param:
-                post_info.append(getattr(post, p))
-            all_posts.append(post_info)
+    run = True
+    offset = 0
+    count = 100
+    while run:
+        url = f'https://api.vk.com/method/wall.get?owner_id={enter_id}' \
+              f'&v=5.52&count={count}&offset={offset}' \
+              f'&access_token={app.config["ACCESS_TOKEN"]}'
+        obj = json.loads(requests.get(url).content)
+        posts = obj['response']['items']
+        for post in posts:
+            if post['date'] >= int(dt):
+                post = Post(post)
+                post_info = []
+                for p in param:
+                    post_info.append(getattr(post, p))
+                all_posts.append(post_info)
+        if len(posts) < count:
+            run = False
+        offset += 100
     return all_posts
 
 

@@ -1,5 +1,5 @@
 from flask import (
-    render_template, redirect, send_file, url_for)
+    render_template, redirect, send_file, url_for, flash)
 from app.server.main.functions import *
 from app import app
 from app.server.forms import EnterForm, CsvForm, StatisticForm
@@ -29,8 +29,7 @@ def enter_data():
             error_mes = 'ID must be a number'
     else:
         error_mes = form.errors
-    return render_template('form.html',
-                           form=form, error=error_mes)
+    return render_template('form.html', form=form, error=error_mes)
 
 
 @app.route('/get_data/<enter_id>&<begin_date>', methods=['GET', 'POST'])
