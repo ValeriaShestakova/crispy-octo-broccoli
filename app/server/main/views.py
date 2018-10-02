@@ -54,12 +54,12 @@ def get_statistic(enter_id, begin_date):
     if form_statistic.validate_on_submit():
         type_measure = form_statistic.type_measure.data
         type_time = form_statistic.type_time.data
-        x_count_posts, x_measure, y = \
+        y_count_posts, y_measure, x = \
             get_data_posts_measure(enter_id, begin_date, type_measure, type_time)
         legend_count = 'Number of posts'
         legend_avg = f'Average of {type_measure[4::]}'
-        return render_template('graph.html', values_count=x_count_posts, labels=y,
-                               legend_count=legend_count, values_avg=x_measure,
+        return render_template('graph.html', values_count=y_count_posts, labels=x,
+                               legend_count=legend_count, values_avg=y_measure,
                                legend_avg=legend_avg, form_csv=form_csv,
                                form_statistic=form_statistic,
                                enter_id=enter_id, begin_date=begin_date)

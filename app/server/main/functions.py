@@ -32,6 +32,12 @@ return posts;
 
 
 def check_data_vk(enter_id, begin_date):
+    """
+    Check input data
+    :param enter_id: id of person or group
+    :param begin_date: date of beginning statistic
+    :return: True if data is correct
+    """
     url = f'https://api.vk.com/method/wall.get?owner_id={enter_id}&count=1' \
           f'&v=5.52&access_token={app.config["ACCESS_TOKEN"]}'
     obj = json.loads(requests.get(url).content)
@@ -51,6 +57,13 @@ def check_data_vk(enter_id, begin_date):
 
 
 def get_data_posts(enter_id, begin_date, param):
+    """
+    Request data from vk API
+    :param enter_id: id of person or group
+    :param begin_date: date of beginning statistic
+    :param param: parameters of post
+    :return: received posts
+    """
     dt = datetime.datetime.strptime(begin_date, "%Y-%m-%d").timestamp()
     all_posts = []
     run = True
@@ -76,6 +89,11 @@ def get_data_posts(enter_id, begin_date, param):
 
 
 def to_csv(param, all_posts):
+    """
+    Write statistic to csv file
+    :param param: parameters of post
+    :param all_posts: all received posts
+    """
     path = app.config["PATH_CSV"]
     with open(path, 'w', encoding='utf-8') as csvfile:
         writer = csv.writer(csvfile)
@@ -85,29 +103,43 @@ def to_csv(param, all_posts):
 
 
 def get_data_posts_measure(enter_id, begin_date, type_measure, type_time):
+    """
+    Get data from posts to statistic graph
+    :param enter_id: id of person or group
+    :param begin_date: date of beginning statistic
+    :param type_measure: like, reposts or comment
+    :param type_time: years, months, days or hours
+    :return: data to plot a graph
+    """
     param = (type_time, type_measure)
     all_posts = get_data_posts(enter_id, begin_date, param)
-    x_count_posts = []
-    x_measure = []
-    y = []
+    y_count_posts = []
+    y_measure = []
+    x = []
     if type_time == 'year':
         begin_year = datetime.datetime.strptime(begin_date, "%Y-%m-%d").year
         current_year = datetime.datetime.now().year
-        y = [i for i in range(begin_year, current_year+1)]
-        x_count_posts, x_measure = get_avg_count(all_posts, y)
+        x = [i for i in range(begin_year, current_year+1)]
+        y_count_posts, y_measure = get_avg_count(all_posts, x)
     elif type_time == 'month':
-        y = [i for i in range(1, 13)]
-        x_count_posts, x_measure = get_avg_count(all_posts, y)
+        x = [i for i in range(1, 13)]
+        y_count_posts, y_measure = get_avg_count(all_posts, x)
     elif type_time == 'week_day':
-        y = [i for i in range(0, 7)]
-        x_count_posts, x_measure = get_avg_count(all_posts, y)
+        x = [i for i in range(0, 7)]
+        y_count_posts, y_measure = get_avg_count(all_posts, x)
     elif type_time == 'hour':
-        y = [i for i in range(0, 25)]
-        x_count_posts, x_measure = get_avg_count(all_posts, y)
-    return x_count_posts, x_measure, y
+        x = [i for i in range(0, 25)]
+        y_count_posts, y_measure = get_avg_count(all_posts, x)
+    return y_count_posts, y_measure, x
 
 
 def get_avg_count(posts, time):
+    """
+    Get average number of posts over time
+    :param posts: all received posts
+    :param time: years, months, days or hours
+    :return: average count of posts
+    """
     x_count_posts = []
     x_measure = []
     for t in time:
