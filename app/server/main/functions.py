@@ -6,38 +6,57 @@ from app.server.models import Post
 from app import app
 
 
+CODE = """
+var ITERS = 25;
+var COUNT = 100;
+var posts = []; 
+var req_params = {
+        "owner_id" : Args.id, 
+        "offset" : 0,         
+        "count"  : COUNT,
+        "v" : "5.52"          
+};
+var i = 0;
+
+while(i < ITERS) {
+    req_params.offset = i*COUNT-(-ITERS*COUNT*Args.offset);    
+    var items = API.wall.get(req_params).items;     
+    if (items.length == 0) {
+        return posts;
+    }    
+    posts.push(items); 
+    i = i-(-1);
+}
+return posts;
+"""
+
+
 def check_data_vk(enter_id, begin_date):
     url = f'https://api.vk.com/method/wall.get?owner_id={enter_id}&count=1' \
           f'&v=5.52&access_token={app.config["ACCESS_TOKEN"]}'
     obj = json.loads(requests.get(url).content)
     if begin_date < datetime.date(1970, 1, 1):
-        return False
+        return False, 'Date is not valid'
     dt = datetime.datetime.strptime(str(begin_date), "%Y-%m-%d").timestamp()
+    if obj['response']['count'] == 0:
+        return False, "Person or group don't have any posts"
     try:
         obj['error']
     except KeyError:
         if obj['response']['items'][0]['date'] < int(dt):
-            return False
+            return False, "Write an earlier date"
         else:
-            return True
-    return False
+            return True, ''
+    return False, 'Data is not valid'
 
 
 def get_data_posts(enter_id, begin_date, param):
-    # url = f'https://api.vk.com/method/wall.get?owner_id={enter_id}' \
-    #       f'&offset=0&count = 1&extended = 0&v=5.52' \
-    #       f'&access_token={app.config["ACCESS_TOKEN"]}'
-    # count = json.loads(requests.get(url).content)
-    # print(count)
     dt = datetime.datetime.strptime(begin_date, "%Y-%m-%d").timestamp()
     all_posts = []
     run = True
     offset = 0
     while run:
-        # url = f'https://api.vk.com/method/wall.get?owner_id={enter_id}' \
-        #       f'&v=5.52&count={count}&offset={offset}' \
-        #       f'&access_token={app.config["ACCESS_TOKEN"]}'
-        url = f'https://api.vk.com/method/execute.getPosts?id={enter_id}' \
+        url = f'https://api.vk.com/method/execute?code={CODE}&id={enter_id}' \
               f'&offset={offset}&v=5.52' \
               f'&access_token={app.config["ACCESS_TOKEN"]}'
         obj = json.loads(requests.get(url).content)

@@ -10,7 +10,7 @@
   <h2>Enter required data</h2>
   <form action='/enter_data' method="post" name="enter_data">
     {% if csrf_token %}
-    {{ form.csrf_token }}
+      {{ form.csrf_token }}
     {% endif %}
     <div class="form-group">
       <label for="enter_id">Person or group ID</label>

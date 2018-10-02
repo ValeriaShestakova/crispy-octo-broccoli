@@ -20,11 +20,10 @@ def enter_data():
         if enter_id.isdigit():
             if form.type_id.data == 'group':
                 enter_id = f'-{enter_id}'
-            if check_data_vk(enter_id, begin_date) is True:
+            valid, error_mes = check_data_vk(enter_id, begin_date)
+            if valid is True:
                 return redirect(url_for('get_data', enter_id=enter_id,
                                         begin_date=str(begin_date)))
-            else:
-                error_mes = 'No such person or group, or date is not valid'
         else:
             error_mes = 'ID must be a number'
     else:
