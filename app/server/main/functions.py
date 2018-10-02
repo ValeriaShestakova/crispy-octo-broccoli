@@ -33,23 +33,26 @@ def get_data_posts(enter_id, begin_date, param):
     all_posts = []
     run = True
     offset = 0
-    count = 100
     while run:
-        url = f'https://api.vk.com/method/wall.get?owner_id={enter_id}' \
-              f'&v=5.52&count={count}&offset={offset}' \
+        # url = f'https://api.vk.com/method/wall.get?owner_id={enter_id}' \
+        #       f'&v=5.52&count={count}&offset={offset}' \
+        #       f'&access_token={app.config["ACCESS_TOKEN"]}'
+        url = f'https://api.vk.com/method/execute.getPosts?id={enter_id}' \
+              f'&offset={offset}&v=5.52' \
               f'&access_token={app.config["ACCESS_TOKEN"]}'
         obj = json.loads(requests.get(url).content)
-        posts = obj['response']['items']
-        for post in posts:
-            if post['date'] >= int(dt):
-                post = Post(post)
-                post_info = []
-                for p in param:
-                    post_info.append(getattr(post, p))
-                all_posts.append(post_info)
-        if len(posts) < count:
-            run = False
-        offset += 100
+        posts = obj['response']
+        for item in posts:
+            for post in item:
+                if post['date'] >= int(dt):
+                    post = Post(post)
+                    post_info = []
+                    for p in param:
+                        post_info.append(getattr(post, p))
+                    all_posts.append(post_info)
+            if len(item) < 100:
+                run = False
+        offset += 1
     return all_posts
 
 
